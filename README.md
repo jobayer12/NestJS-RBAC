@@ -56,7 +56,7 @@ We'll implement three different systems:
 
 ```bash
 # Clone the repository
-git clone <your-repo-url>
+git clone https://github.com/jobayer12/NestJS-RBAC
 cd nestjs-rbac-complete
 
 # Install dependencies
