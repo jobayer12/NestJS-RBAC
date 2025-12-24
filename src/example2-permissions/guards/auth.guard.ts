@@ -6,11 +6,14 @@ import {
 } from '@nestjs/common';
 import { Reflector } from '@nestjs/core';
 import { IS_PUBLIC_KEY } from '../decorators/public.decorator';
-import { Permission } from '../enums/permissions.enum';
+import { AuthService } from '../services/auth.service';
 
 @Injectable()
 export class AuthGuard implements CanActivate {
-  constructor(private reflector: Reflector) {}
+  constructor(
+    private reflector: Reflector,
+    private authService: AuthService,
+  ) {}
 
   async canActivate(context: ExecutionContext): Promise<boolean> {
     const isPublic = this.reflector.getAllAndOverride<boolean>(IS_PUBLIC_KEY, [
@@ -54,50 +57,7 @@ export class AuthGuard implements CanActivate {
   }
 
   private async validateToken(token: string): Promise<any> {
-    const users = new Map([
-      [
-        'token-read-only',
-        {
-          id: '1',
-          username: 'reader',
-          email: 'reader@example.com',
-          permissions: [Permission.READ],
-        },
-      ],
-      [
-        'token-creator',
-        {
-          id: '2',
-          username: 'creator',
-          email: 'creator@example.com',
-          permissions: [Permission.READ, Permission.CREATE],
-        },
-      ],
-      [
-        'token-editor',
-        {
-          id: '3',
-          username: 'editor',
-          email: 'editor@example.com',
-          permissions: [Permission.READ, Permission.UPDATE],
-        },
-      ],
-      [
-        'token-full-access',
-        {
-          id: '4',
-          username: 'admin',
-          email: 'admin@example.com',
-          permissions: [
-            Permission.READ,
-            Permission.CREATE,
-            Permission.UPDATE,
-            Permission.DELETE,
-          ],
-        },
-      ],
-    ]);
-
-    return users.get(token) || null;
+    const user = this.authService.validateToken(token);
+    return user;
   }
 }
